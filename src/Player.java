@@ -39,8 +39,7 @@ public class Player {
 
     @Override
     public String toString(){
-        return nome +
-                "," + nVitoria;
+        return nome + "," + nVitoria;
     }
 }
 

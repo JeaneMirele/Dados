@@ -11,7 +11,7 @@ public class APP {
                 int escolha;
 
                 do {
-
+                        game.rankingTopFive("Vencedores.txt");
                         System.out.println("--JOGO DOS DADOS--");
                         game.verificaJogadores();
                         game.CriandoPlayer();
@@ -26,19 +26,8 @@ public class APP {
 
                         System.out.println("Numero sorteado: " + soma);
 
-                        Player vencedor = game.Vencedor(soma);
-                        String arquivo = "Vencedores.txt";
+                        game.Vencedor(soma);
 
-                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivo, true))) {
-                                writer.write(String.valueOf(vencedor));
-                                writer.newLine();
-
-                        } catch (Exception e) {
-                                System.out.println("Dados não gravados no arquivo" + e.getMessage());
-                        }
-
-
-                        game.rankingTopFive();
                         System.out.println("Para jogar novamente digite 1, para sair 0");
                         escolha = sc.nextInt();
                         sc.nextLine();
@@ -48,6 +37,15 @@ public class APP {
         }
 
         public static void atualizarArquivoVencedores(String arquivo, Player vencedor) {
+                File file = new File(arquivo);
+                if (!file.exists()) {
+                        try {
+                                file.createNewFile();
+                        } catch (IOException e) {
+                                System.out.println("Erro ao criar o arquivo: " + e.getMessage());
+                        }
+                }
+
                 Map<String, Integer> registros = new HashMap<>();
 
 
@@ -60,6 +58,7 @@ public class APP {
                                         int vitorias = Integer.parseInt(dados[1]);
                                         registros.put(nome, vitorias);
                                 }
+
                         }
                 } catch (IOException e) {
                         System.out.println("Erro ao ler o arquivo: " + e.getMessage());

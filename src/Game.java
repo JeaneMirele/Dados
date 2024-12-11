@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -77,38 +80,53 @@ public class Game {
         return resultado1+resultado2;
     }
 
-    public Player Vencedor(int soma){
+    public Player Vencedor(int soma) {
         Player vencedor = null;
 
-        for(Player player: players) {
-            if (player.getNumero() == soma ) {
-                player.setnVitoria(player.getnVitoria()+1);
+        for (Player player : players) {
+            if (player.getNumero() == soma) {
+                player.setnVitoria(player.getnVitoria() + 1);
                 vencedor = player;
             }
         }
 
-        if(vencedor!= null){
-            System.out.println("Vencedor: "+ vencedor);
+        if (vencedor != null) {
+            System.out.println("Vencedor: " + vencedor);
             APP.atualizarArquivoVencedores("Vencedores.txt", vencedor);
             return vencedor;
-        }else{
+        } else {
             Player maquina = new Player("Máquina", -1, 1);
             System.out.println("A máquina venceu!");
             APP.atualizarArquivoVencedores("Vencedores.txt", maquina);
             return maquina;
         }
     }
-    public void rankingTopFive(){
-        TreeSet<Player> ranking = new TreeSet<>(Comparator.comparingInt(Player::getnVitoria).reversed());
-        ranking.addAll((players));
 
-        int posicao = 1;
-        for (Player player : ranking) {
-           if(player.getnVitoria()>0){
-               System.out.println("RANKING");
-               System.out.println(posicao + " | " + player.getNome() + "- Vitórias: "+ player.getnVitoria());
-           }
-            posicao++;
+    public void rankingTopFive(String arquivo){
+        System.out.println("RANKING");
+
+        Map<String, Integer> registros = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                String[] dados = linha.split(",");
+                if (dados.length == 2) {
+                    String nome = dados[0];
+                    int vitorias = Integer.parseInt(dados[1]);
+                    registros.put(nome, vitorias);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
         }
-    }
+
+
+        registros.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(5)
+                .forEach(entry -> {
+                    System.out.println(entry.getKey() + " - Vitórias: " + entry.getValue());
+                });
+
+        }
 }
